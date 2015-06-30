@@ -23,7 +23,8 @@ fun! pymode#folding#text() " {{{
     endif
     let line = getline(fs)
 
-    let nucolwidth = &fdc + &number * &numberwidth
+    let has_numbers = &number || &relativenumber
+    let nucolwidth = &fdc + has_numbers * &numberwidth
     let windowwidth = winwidth(0) - nucolwidth - 6
     let foldedlinecount = v:foldend - v:foldstart
 
@@ -79,7 +80,7 @@ fun! pymode#folding#expr(lnum) "{{{
     " Handle nested defs but only for files shorter than
     " g:pymode_folding_nest_limit lines due to performance concerns
     if line('$') < g:pymode_folding_nest_limit && indent(prevnonblank(a:lnum))
-        let curpos = getcurpos()
+        let curpos = getpos('.')
         try
             let last_block = s:BlockStart(a:lnum)
             let last_block_indent = indent(last_block)
@@ -131,10 +132,6 @@ fun! pymode#folding#expr(lnum) "{{{
         else
             return '='
         endif
-    endif
-
-    if indent == 0
-        return 0
     endif
 
     return '='
